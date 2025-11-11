@@ -4,13 +4,13 @@ public class Robot {
     boolean grippingBoxExpected = false;
     int detectedErrors = 0;
 
-    static final int MAX_DETECTED_ERRORS = 2;
+    static final int MAX_DETECTED_ERRORS = 5;
 
     double armHeight = 0;
     double armLength = 0;
     boolean grippingBox = false;
-    double physicalFailureRate = 0.2;
-    double softwareFailureRate = 0.2;
+    double physicalFailureRate = 0.4;
+    double softwareFailureRate = 0.1;
 
     void sleepMs(long ms) {
         try {
@@ -134,9 +134,9 @@ public class Robot {
         }
     }
 
-    void switchBoxGrip() {
+    void setBoxGripState(boolean grip) {
         checkGrippingBox = true;
-        grippingBoxExpected = !grippingBoxExpected;
+        grippingBoxExpected = grip;
 
         String verb = grippingBoxExpected ? "Closing" : "Opening";
         printProgress(verb + " gripper ", 3, 160);
@@ -146,7 +146,7 @@ public class Robot {
             printProgress(red("Box grip state not changed "), 2, 130);
             return;
         }
-        grippingBox = !grippingBox;
+        grippingBox = grippingBoxExpected;
         System.out.println("-> Gripper now: " + grippingBox);
     }
 
@@ -197,7 +197,7 @@ public class Robot {
                         + " measured=" + measured));
                 System.out.println(red("Resetting gripping status to expected value"));
                 sleepMs(1000);
-                switchBoxGrip();
+                setBoxGripState(grippingBoxExpected);
                 System.out.println("Re-verifying system after correction");
                 verifySystem();
             } else {
@@ -231,7 +231,7 @@ public class Robot {
         verifySystem();
 
         printProgress("Closing gripper to pick box ", 4, 140);
-        switchBoxGrip();
+        setBoxGripState(true);
         sleepMs(1000);
         verifySystem();
 
@@ -246,13 +246,20 @@ public class Robot {
         verifySystem();
 
         printProgress("Opening gripper to release box ", 4, 140);
-        switchBoxGrip();
+        setBoxGripState(false);
         sleepMs(1000);
         verifySystem();
     }
 
     public static void main(String[] args) {
         Robot robot = new Robot();
+
+        System.out.println();
+        System.out.println("Running robot with physical/sofware failure rate:");
+        System.out.println(robot.physicalFailureRate * 100 + "% physical failure rate"
+                + " and " + robot.softwareFailureRate * 100 + "% software failure rate.");
+        System.out.println();
+
         try {
             robot.fetchBoxFromHeight(2.0);
             System.out.println("Box fetched successfully!");
