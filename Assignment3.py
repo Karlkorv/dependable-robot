@@ -11,12 +11,12 @@ board = [[1, 2, 3, 4, 5, 6],
          [37, 38, 39, 40, 41, 42]]
 
 known_obstacles = [[False, False, False, False, False, False],
-                   [False, False, True, False, False, True],
-                   [False, False, False, False, False, False],
-                   [False, True, False, False, False, False],
+                   [False, True, True, False, False, False],
                    [False, False, False, False, False, False],
                    [False, False, False, False, False, False],
-                   [False, True, False, False, False, False]]
+                   [False, False, False, False, True, False],
+                   [False, False, False, False, True, False],
+                   [False, False, False, False, False, False]]
 
 robot_position = (0, 0)
 target_position = (6, 3)
