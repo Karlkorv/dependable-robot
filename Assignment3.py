@@ -14,27 +14,43 @@ known_obstacles = [[False, False, False, False, False, False],
                    [False, False, True, False, False, True],
                    [False, False, False, False, False, False],
                    [False, True, False, False, False, False],
-                   [False, True, False, False, False, False],
+                   [False, False, False, False, False, False],
                    [False, False, False, False, False, False],
                    [False, True, False, False, False, False]]
 
 robot_position = (0, 0)
 target_position = (6, 3)
 
+def print_board(board, known_obstacles, robot_position, target_position):
+    for r in range(len(board)):
+        row_display = ""
+        for c in range(len(board[0])):
+            if (r, c) == robot_position:
+                row_display += " R "
+            elif (r, c) == target_position:
+                row_display += " T "
+            elif known_obstacles[r][c]:
+                row_display += " X "
+            else:
+                row_display += f" . "
+        print(row_display)
+    print("\n")
 
-def step_through_path(path):
+
+def step_through_path(path, known_obstacles=known_obstacles):
     if not path:
         return robot_position
     
     robot_position = path[0]
     
     for position in path[1:]:
-        if random.random() < 0.9:
+        if random.random() < 0.1:
             print("Obstacle detected! at position:", position, "Recalculating path...")
             known_obstacles[position[0]][position[1]] = True
-            return robot_position
-        print(f"Stepping to position: {position}")
-        sleep(0.5) 
+            break
+        print(f"Bug2: Stepping to position {position}")
+        print_board(board, known_obstacles, position, target_position)
+        sleep(1) 
         robot_position = position
         
     return robot_position
@@ -82,15 +98,20 @@ def dijkstra_find_path(board, known_obstacles, start_pos, end_pos):
 
 path = dijkstra_find_path(board, known_obstacles, robot_position, target_position)
 for i in path:
-    print(board[i[0]][i[1]])
+    print("Dijkstra's shortest path step: ", i)
+    print_board(board, known_obstacles, i, target_position)
+    sleep(1)
 
-while (new_position := step_through_path(path)) != robot_position:
+while (new_position := step_through_path(path, known_obstacles)) != target_position:
     robot_position = new_position
     path = dijkstra_find_path(board, known_obstacles, robot_position, target_position)
     if not path:
         print("No available path to the target!")
         break
-    for i in path:
-        print(board[i[0]][i[1]])
 
-print("Robot terminating at: ", robot_position)
+if new_position == target_position:
+    robot_position = new_position
+    
+if robot_position == target_position:
+    print("Robot has reached the target!")
+print("Robot terminating at: ", robot_position, " Target was at: ", target_position)
